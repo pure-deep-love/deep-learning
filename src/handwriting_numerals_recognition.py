@@ -4,8 +4,10 @@ import torchvision
 from torch.utils.data import DataLoader
 import PIL
 
-train_data = torchvision.datasets.MNIST(root='../data', train=True, transform=torchvision.transforms.ToTensor(), download=True)
-test_data = torchvision.datasets.MNIST(root='../data', train=False, transform=torchvision.transforms.ToTensor(), download=True)
+train_data = torchvision.datasets.MNIST(root='../data', train=True,
+                                         transform=torchvision.transforms.ToTensor(), download=True)
+test_data = torchvision.datasets.MNIST(root='../data', train=False, 
+                                       transform=torchvision.transforms.ToTensor(), download=True)
 train_dataloader = DataLoader(dataset=train_data, batch_size=64, shuffle=True)
 test_dataloader = DataLoader(dataset=test_data, batch_size=64, shuffle=True)
 
@@ -27,8 +29,7 @@ for epoch in range(num_epochs):
     l_sum, train_acc_num = 0, 0
     net.train()
     for X, y in train_dataloader:
-        X = X.cuda()
-        y = y.cuda()
+        X, y = X.cuda(), y.cuda()
         y_hat = net(X)
         l = loss(y_hat, y)
         trainer.zero_grad()
@@ -43,8 +44,7 @@ for epoch in range(num_epochs):
     net.eval()
     with torch.no_grad():
         for X, y in test_dataloader:
-            X = X.cuda()
-            y = y.cuda()
+            X, y = X.cuda(), y.cuda()
             y_hat = net(X)
             l = loss(y_hat, y)
             test_acc_num += (y_hat.argmax(axis=1) == y).sum()
@@ -52,4 +52,4 @@ for epoch in range(num_epochs):
     print(f'test loss mean: {test_l_sum / len(test_data):.2f}')
     print(f'test accuracy: {test_acc_num / len(test_data):.2f}')
 
-torch.save(net.state_dict(), './han_num.params')
+torch.save(net.state_dict(), '../state_dict/han_num.params')

@@ -12,17 +12,12 @@ with open('../data/words.txt', 'r', encoding='utf-8') as f:
 tokens = [list(line) for line in lines]
 
 class Vocab:
-    """Vocabulary for text."""
     def __init__(self, tokens=[], min_freq=0, reserved_tokens=[]):
-        """Defined in :numref:`sec_text-sequence`"""
-        # Flatten a 2D list if needed
         if tokens and isinstance(tokens[0], list):
             tokens = [token for line in tokens for token in line]
-        # Count token frequencies
         counter = collections.Counter(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[1],
                                   reverse=True)
-        # The list of unique tokens
         self.idx_to_token = list(sorted(set(['<unk>'] + reserved_tokens + [
             token for token, freq in self.token_freqs if freq >= min_freq]), key=lambda x:' '.join(map(str, x))))
         self.token_to_idx = {token: idx
@@ -50,8 +45,7 @@ corpus = [vocab[token] for line in tokens for token in line]
 
 batch_size, num_steps = 64, 16
 
-class SeqDataLoader:  #@save
-    """加载序列数据的迭代器"""
+class SeqDataLoader:
     def __init__(self, corpus, batch_size, num_steps):
         self.corpus = corpus
         self.batch_size = batch_size
@@ -115,7 +109,7 @@ def predict(words, num_preds, net, vocab, device):
         outputs.append(int(y.argmax(dim=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
-# print(predict('新年好', 30, net, vocab, device))
+# print(predict('新年快乐', 30, net, vocab, device))
 
 num_epochs, lr, theta = 500, 2, 1e0
 trainer = torch.optim.SGD(net.parameters(), lr)
